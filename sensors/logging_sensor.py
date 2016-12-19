@@ -102,7 +102,7 @@ class LoggingWatchSensor(Sensor):
                     self.sensor_service.dispatch(trigger=trigger, payload=payload)
                 else:
                     #TODO: auth success
-                    trigger = 'campus_ztp.rpvlan_new_mac_auth_failure'
+                    trigger = 'campus_ztp.rpvlan_new_mac_auth_success'
                     self.sensor_service.dispatch(trigger=trigger, payload=payload)
                 cursor.close()
                 connection.close()
