@@ -31,7 +31,7 @@ class RpvlanUpdateMacAuthFailureDatabaseAction(Action):
 
 	#Insert new row.
 	cursor = connection.cursor()
-        sql = "insert into failed_macs values (mac, device, port) values('%s','%s','%s')" % (mac,device,port)
+        sql = "insert into failed_macs (mac, device, port) values('%s','%s','%s')" % (mac,device,port)
         cursor.execute(sql)
         connection.commit()
         cursor.close()
