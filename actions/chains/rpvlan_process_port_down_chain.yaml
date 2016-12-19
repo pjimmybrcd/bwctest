@@ -1,0 +1,18 @@
+---
+  chain:
+    -
+      name: "send_cli_template"
+      ref: "campus_ztp.send_cli_template"
+      parameters:
+        device: "{{device}}"
+        template: "rpvlan_private_vlan"
+        variables: "{\"commit\":\"false\",\"vlan\":\"{{vlan}}\",\"port\":\"{{port}}\"}"
+      on-success: "rpvlan_update_port_status_in_database"
+    -
+      name: "rpvlan_update_port_status_in_database"
+      ref: "campus_ztp.rpvlan_update_port_status_in_database"
+      parameters:
+        device: "{{device}}"
+        vlan: "{{vlan}}"
+        port: "{{port}}"
+        action: "remove"

@@ -1,0 +1,20 @@
+---
+name: "rpvlan_process_port_down_chain"
+description: "Campus ZTP Private VLAN Port Down Workflow"
+
+runner_type: "action-chain"
+
+entry_point: "chains/rpvlan_process_port_down_chain.yaml"
+
+enabled: true
+
+parameters:
+  device:
+    type: "string"
+    required: true
+  port:
+    type: "string"
+    required: true
+  vlan:
+    type: "string"
+    required: true
