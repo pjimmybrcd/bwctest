@@ -71,9 +71,11 @@ class LoggingWatchSensor(Sensor):
                 cursor.execute(sql)
                 count = cursor.fetchone()[0]
                 if count==0:
+                    print "should not allow"
                     trigger = 'campus_ztp.rpvlan_new_mac_auth_failure_do_not_allow'
                     self.sensor_service.dispatch(trigger=trigger, payload=payload)
                 else:
+                    print "should allow"
                     trigger = 'campus_ztp.rpvlan_new_mac_auth_failure'
                     self.sensor_service.dispatch(trigger=trigger, payload=payload)
                 cursor.close()
