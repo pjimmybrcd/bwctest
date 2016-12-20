@@ -47,8 +47,8 @@ class LoggingWatchSensor(Sensor):
         pass
 
     def _handle_line(self, file_path, line):
-        # Jan  1 07:26:35 ZTP_Campus_ICX7750 MAC Authentication failed for [406c.8f38.4fb7 ] on port 2/1/33 (Invalid User)
-        regex = re.compile('(^\w+\s+\d+\s\d+:\d+:\d+ )([\w_-]+)( MAC Authentication failed for \[)([0-9a-f]{4}\.[0-9a-f]{4}\.[0-9a-f]{4})( \] on port )(\d+/\d+/\d+)( .*)')
+        #Dec 19 17:10:19 RSOC-TEST-STACK 172.20.40.243 MAC Authentication failed for [f8e7.1e0f.9080 ] on port 2/1/29 (Invalid User)
+        regex = re.compile('(^\w+\s+\d+\s\d+:\d+:\d+ )([\w_-]+ )(\d+\.\d+\.\d+\.\d+)( MAC Authentication failed for \[)([0-9a-f]{4}\.[0-9a-f]{4}\.[0-9a-f]{4})( \] on port )(\d+\/\d+\/\d+)( .*)')
         match = regex.match(line)
         if match:
                 payload = {
