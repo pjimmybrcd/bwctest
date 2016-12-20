@@ -24,14 +24,14 @@ class RpvlanUpdateMacAuthFailureDatabaseAction(Action):
 
         #Remove the mac addr tuple in table may not be in there but it's fine
 	cursor = connection.cursor()
-	sql = "delete from failed_macs where mac='%s'" % (mac)
+	sql = "delete from failures where mac='%s'" % (mac)
         cursor.execute(sql)
         connection.commit()
 	cursor.close()
 
 	#Insert new row.
 	cursor = connection.cursor()
-        sql = "insert into failed_macs (mac, device, port) values('%s','%s','%s')" % (mac,device,port)
+        sql = "insert into failures (mac, device, port) values('%s','%s','%s')" % (mac,device,port)
         cursor.execute(sql)
         connection.commit()
         cursor.close()

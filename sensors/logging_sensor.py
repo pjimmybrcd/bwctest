@@ -47,14 +47,15 @@ class LoggingWatchSensor(Sensor):
         pass
 
     def _handle_line(self, file_path, line):
-        #Dec 19 17:10:19 RSOC-TEST-STACK 172.20.40.243 MAC Authentication failed for [f8e7.1e0f.9080 ] on port 2/1/29 (Invalid User)
-        regex = re.compile('(^\w+\s+\d+\s\d+:\d+:\d+ )([\w_-]+ )(\d+\.\d+\.\d+\.\d+)( MAC Authentication failed for \[)([0-9a-f]{4}\.[0-9a-f]{4}\.[0-9a-f]{4})( \] on port )(\d+\/\d+\/\d+)( .*)')
+        # Jan 1 07:26:35 ZTP_Campus_ICX7750 172.20.40.243 MACAUTH: Port 1/1/48 Mac 406c.8f38.4fb7 - authentication failed since RADIUS server rejected
+        
+        regex = re.compile('(^\w+\s+\d+\s\d+:\d+:\d+ )([\w_-]+ )(\d+\.\d+\.\d+\.\d+)( MACAUTH: Port )(\d+\/\d+\/\d+)( Mac )([0-9a-f]{4}\.[0-9a-f]{4}\.[0-9a-f]{4})( - authentication failed.*)')
         match = regex.match(line)
         if match:
                 payload = {
                         'device': match.group(3),
-                        'mac': match.group(5), 
-                        'port': match.group(7)
+                        'mac': match.group(7), 
+                        'port': match.group(5)
                 }
                 # check to see if this exists in DB
                 connection = pymysql.connect(
@@ -65,7 +66,8 @@ class LoggingWatchSensor(Sensor):
                 cursor = connection.cursor()
 
                 # Check to make sure this isn't already logged for tracking
-                sql = "select count(*) from failed_macs where mac='%s' and device='%s' and port='%s'" % (match.group(6),match.group(2),match.group(4)) 
+                sql = "select count(*) from failures where mac='%s' and device='%s' and port='%s'" % (payload["mac"],payload["device"],payload["port"]) 
+                
                 cursor.execute(sql)
                 count = cursor.fetchone()[0]
                 if count==0:
