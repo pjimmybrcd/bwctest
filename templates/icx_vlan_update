@@ -6,16 +6,16 @@
   authentication
   no mac-authentication enable ethernet {{port}}
 
-  vlan {{vlan}}
+  vlan 233
   untagged ethernet {{port}}
 !
 {% endif %}
 !{#################################################################
 !    This is the commands to execute to reverse the configuration
-1##################################################################}
+!##################################################################}
 {% if not commit=='true' %}
 !
-vlan {{vlan}}
+vlan 300
   no untagged ethernet {{port}}
   authentication
   mac-authentication enable ethernet {{port}}
