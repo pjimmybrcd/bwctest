@@ -1,9 +1,0 @@
----
-  chain:
-    -
-      name: "rpvlan_update_mac_auth_success_database"
-      ref: "campus_ztp.rpvlan_update_mac_auth_success_database"
-      parameters:
-        device: "{{device}}"
-        mac: "{{mac}}"
-        port: "{{port}}"
