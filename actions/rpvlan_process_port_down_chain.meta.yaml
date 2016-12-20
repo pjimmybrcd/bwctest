@@ -15,6 +15,3 @@ parameters:
   port:
     type: "string"
     required: true
-  vlan:
-    type: "string"
-    required: true

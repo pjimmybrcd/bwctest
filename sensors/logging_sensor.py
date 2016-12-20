@@ -64,7 +64,7 @@ class LoggingWatchSensor(Sensor):
                    db='users')
                 cursor = connection.cursor()
 
-                # Check to make sure this isn't already logged for tracking
+                # Check to make sure this port was previously authorized
                 sql = "select count(*) from authorized where port='%s'" % (payload["port"]) 
                 
                 cursor.execute(sql)
@@ -75,7 +75,7 @@ class LoggingWatchSensor(Sensor):
                     self.sensor_service.dispatch(trigger=trigger, payload=payload)
                 cursor.close()
                 connection.close()
-
+                return
 
 
 
@@ -114,3 +114,4 @@ class LoggingWatchSensor(Sensor):
                     self.sensor_service.dispatch(trigger=trigger, payload=payload)
                 cursor.close()
                 connection.close()
+                return
