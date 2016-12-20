@@ -1,6 +1,6 @@
-{#################################################################
-    This are the commands to execute the configuration
-##################################################################}
+!{#################################################################
+!    This are the commands to execute the configuration
+!##################################################################}
 {% if commit=='true' %}
 !
   authentication
@@ -10,9 +10,9 @@
   untagged ethernet {{port}}
 !
 {% endif %}
-{#################################################################
-    This is the commands to execute to reverse the configuration
-##################################################################}
+!{#################################################################
+!    This is the commands to execute to reverse the configuration
+1##################################################################}
 {% if not commit=='true' %}
 !
 vlan {{vlan}}
@@ -21,4 +21,3 @@ vlan {{vlan}}
   mac-authentication enable ethernet {{port}}
 !
 {% endif %}
-
