@@ -1,9 +1,10 @@
 ---
 name: "rpvlan_mac_auth_failure_do_not_allow_database"
-runner_type: "run-python"
 description: "records the mac address location in the database for future use"
+runner_type: "action-chain"
+entry_point: "chains/rpvlan_process_new_mac_auth_failure_chain.yaml"
 enabled: true
-entry_point: "rpvlan_mac_auth_failure_do_not_allow_database.py"
+
 parameters:
   device:
     type: "string"
