@@ -16,6 +16,18 @@
 #          vlan:
 #            type: "string"
     -
+      name: "rpvlan_new_mac_auth_failure_do_not_allow"
+      description: "Trigger which indicates a new mac failure has be detected and should not be allowed."
+      payload_schema:
+        type: "object"
+        properties:
+          device:
+            type: "string"
+          mac:
+            type: "string"
+          port:
+            type: "string"
+    -
       name: "rpvlan_new_mac_auth_failure"
       description: "Trigger which indicates a new mac failure has be detected"
       payload_schema:
