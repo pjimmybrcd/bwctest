@@ -10,4 +10,3 @@ action:
   parameters:
     device: "{{trigger.device}}"
     port: "{{trigger.port}}"
-    vlan: "{{trigger.vlan}}"

@@ -9,10 +9,6 @@ parameters:
     type: "string"
     description: "Device"
     required: true
-  vlan:
-    type: "integer"
-    description: "vlan"
-    required: true
   port:
     type: "string"
     description: "port"
