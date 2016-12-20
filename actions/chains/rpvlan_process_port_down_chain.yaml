@@ -5,7 +5,7 @@
       ref: "campus_ztp.send_cli_template"
       parameters:
         device: "{{device}}"
-        template: "icx_update_vlan"
+        template: "icx_vlan_update"
         variables: "{\"commit\":\"false\",\"vlan\":\"233\",\"port\":\"{{port}}\"}"
       on-success: "rpvlan_update_port_status_in_database"
     -
