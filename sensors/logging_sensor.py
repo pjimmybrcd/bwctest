@@ -47,76 +47,14 @@ class LoggingWatchSensor(Sensor):
         pass
 
     def _handle_line(self, file_path, line):
-        """
-	# Jan  1 01:06:53 ZTP_Campus_ICX7750 System: Interface ethernet 1/1/48, state down
-	regex = re.compile('(^\w+\s+\d+\s\d+:\d+:\d+ )([\w_]+)( System: Interface ethernet )(\d+/\d+/\d+)(, state down)')
-	match = regex.match(line)
-	if match:
-                connection = pymysql.connect(
-                   host="127.0.0.1",
-                   user="root",
-                   passwd="password",
-                   db='users')
-                with connection.cursor() as cursor:
-                     # Check to make sure this port is in the PVLAN
-
-                     # up/downs
-                     sql = "select vlan_id from ports where device='%s' and port='%s' and TIMESTAMPDIFF(SECOND, timestamp, NOW())>120" % (match.group(2),match.group(4)) 
-                     cursor.execute(sql)
-                     results = cursor.fetchone()
-                     if results:
-                        vlan_id=results[0]
-        	        payload = {
-			   'device': match.group(2),
-			   'vlan' : '%d' % vlan_id,
-			   'port' : match.group(4)
-        		}
-        		trigger = 'campus_ztp.rpvlan_port_down'
-                        self.sensor_service.dispatch(trigger=trigger, payload=payload)
-        """
-        
-        # Jan  1 07:26:35 ZTP_Campus_ICX7750 MACAUTH: Port 1/1/48 Mac 406c.8f38.4fb7 - New Device Plugged In
-        
-        regex = re.compile('(^\w+\s+\d+\s\d+:\d+:\d+ )([\w_]+)( MACAUTH: Port )(\d+/\d+/\d+)( Mac )([0-9a-f]{4}\.[0-9a-f]{4}\.[0-9a-f]{4})( - New Device Plugged In.*)')
+        # Jan  1 07:26:35 ZTP_Campus_ICX7750 MAC Authentication failed for [406c.8f38.4fb7 ] on port 2/1/33 (Invalid User)
+        regex = re.compile('(^\w+\s+\d+\s\d+:\d+:\d+ )([\w_-]+)( MAC Authentication failed for \[)([0-9a-f]{4}\.[0-9a-f]{4}\.[0-9a-f]{4})( \] on port )(\d+/\d+/\d+)( .*)')
         match = regex.match(line)
         if match:
                 payload = {
                         'device': match.group(2),
-                        'mac': match.group(6), 
-                        'port': match.group(4)
-                }
-                # check to see if this exists in DB
-                connection = pymysql.connect(
-                   host="127.0.0.1",
-                   user="root",
-                   passwd="password",
-                   db='users')
-                cursor = connection.cursor()
-
-                # Check to make sure this isn't already logged for tracking
-                sql = "select count(*) from authorized_macs where mac='%s'" % (match.group(6)) 
-                cursor.execute(sql)
-                count = cursor.fetchone()[0]
-                if count==0:
-                    trigger = 'campus_ztp.rpvlan_new_mac_auth_failure'
-                    self.sensor_service.dispatch(trigger=trigger, payload=payload)
-                else:
-                    #TODO: auth success
-                    trigger = 'campus_ztp.rpvlan_new_mac_auth_success'
-                    self.sensor_service.dispatch(trigger=trigger, payload=payload)
-                cursor.close()
-                connection.close()
-
-        """
-        # Jan  1 07:26:35 ZTP_Campus_ICX7750 MACAUTH: Port 1/1/48 Mac 406c.8f38.4fb7 - authentication failed since RADIUS server rejected
-        
-        regex = re.compile('(^\w+\s+\d+\s\d+:\d+:\d+ )([\w_]+)( MACAUTH: Port )(\d+/\d+/\d+)( Mac )([0-9a-f]{4}\.[0-9a-f]{4}\.[0-9a-f]{4})( - authentication failed.+)')
-        match = regex.match(line)
-        if match:
-                payload = {
-                        'device': match.group(2),
-                        'mac': match.group(6), 
-                        'port': match.group(4)
+                        'mac': match.group(4), 
+                        'port': match.group(6)
                 }
                 # check to see if this exists in DB
                 connection = pymysql.connect(
@@ -135,4 +73,3 @@ class LoggingWatchSensor(Sensor):
                     self.sensor_service.dispatch(trigger=trigger, payload=payload)
                 cursor.close()
                 connection.close()
-        """

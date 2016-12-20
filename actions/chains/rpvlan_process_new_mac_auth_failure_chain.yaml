@@ -7,3 +7,11 @@
         device: "{{device}}"
         mac: "{{mac}}"
         port: "{{port}}"
+    -
+      name: "send_cli_template"
+      ref: "campus_ztp.send_cli_template"
+      parameters:
+        device: "{{device}}"
+        template: "icx_vlan_update"
+        variables: "{\"commit\":\"true\",\"vlan\":\"{233}\",\"port\":\"{{port}}\"}"
+      on-success: ""
