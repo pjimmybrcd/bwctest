@@ -1,8 +1,8 @@
 ---
-name: "rpvlan_process_new_mac_auth_failure_do_not_allow_database"
-description: "add event to the failures table"
+name: "rpvlan_process_new_mac_auth_failure_do_not_allow_chain"
+description: "Chain to add event to the failures table"
 runner_type: "action-chain"
-entry_point: "chains/rpvlan_process_new_mac_auth_failure_do_not_allow_database.yaml"
+entry_point: "chains/rpvlan_process_new_mac_auth_failure_do_not_allow_chain.yaml"
 enabled: true
 
 parameters:
