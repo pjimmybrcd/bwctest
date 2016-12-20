@@ -14,4 +14,4 @@
       parameters:
         device: "{{device}}"
         template: "icx_vlan_update"
-        variables: "{\"commit\":\"false\",\"vlan\":\"233\",\"port\":\"{{port}}\"}"
+        variables: "{\"commit\":\"false\",\"vlan\":\"223\",\"port\":\"{{port}}\"}"
