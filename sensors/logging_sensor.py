@@ -52,9 +52,9 @@ class LoggingWatchSensor(Sensor):
         match = regex.match(line)
         if match:
                 payload = {
-                        'device': match.group(2),
-                        'mac': match.group(4), 
-                        'port': match.group(6)
+                        'device': match.group(3),
+                        'mac': match.group(5), 
+                        'port': match.group(7)
                 }
                 # check to see if this exists in DB
                 connection = pymysql.connect(
