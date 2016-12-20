@@ -38,7 +38,7 @@ class RpvlanUpdateMacAuthFailureDatabaseAction(Action):
 
   def process_remove_port(self,device,port):
         connection = pymysql.connect(
-             host="127.0.0.`", 
+             host="127.0.0.1", 
              user="root",      
              passwd="password",  
              db='users') 
@@ -50,7 +50,7 @@ class RpvlanUpdateMacAuthFailureDatabaseAction(Action):
 
 	sql = "delete from failures where port='%s'" % (port)
         cursor.execute(sql)
-        connection.commit()
         cursor.close()
+        connection.commit()
         connection.close()
 
