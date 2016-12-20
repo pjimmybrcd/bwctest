@@ -1,0 +1,20 @@
+---
+name: "rpvlan_update_mac_auth_failure_database"
+runner_type: "run-python"
+description: "records the mac address location in the database for future use"
+enabled: true
+entry_point: "rpvlan_update_mac_auth_failure_database.py"
+parameters:
+  device:
+    type: "string"
+    description: "Device"
+    required: true
+  mac:
+    type: "string"
+    description: "mac address"
+    required: true
+  port:
+    type: "string"
+    description: "port"
+    required: true
+

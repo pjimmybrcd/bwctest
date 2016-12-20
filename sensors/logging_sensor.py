@@ -66,11 +66,14 @@ class LoggingWatchSensor(Sensor):
                 cursor = connection.cursor()
 
                 # Check to make sure this isn't already logged for tracking
-                sql = "select count(*) from failures where mac='%s' and device='%s' and port='%s'" % (payload["mac"],payload["device"],payload["port"]) 
+                sql = "select count(*) from authorized where mac='%s'" % (payload["mac"]) 
                 
                 cursor.execute(sql)
                 count = cursor.fetchone()[0]
                 if count==0:
+                    trigger = 'campus_ztp.rpvlan_new_mac_auth_failure_do_not_allow'
+                    self.sensor_service.dispatch(trigger=trigger, payload=payload)
+                else:
                     trigger = 'campus_ztp.rpvlan_new_mac_auth_failure'
                     self.sensor_service.dispatch(trigger=trigger, payload=payload)
                 cursor.close()

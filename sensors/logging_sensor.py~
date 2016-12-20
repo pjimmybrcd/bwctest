@@ -66,7 +66,8 @@ class LoggingWatchSensor(Sensor):
                 cursor = connection.cursor()
 
                 # Check to make sure this isn't already logged for tracking
-                sql = "select count(*) from failed_macs where mac='%s' and device='%s' and port='%s'" % (match.group(6),match.group(2),match.group(4)) 
+                sql = "select count(*) from failures where mac='%s' and device='%s' and port='%s'" % (payload["mac"],payload["device"],payload["port"]) 
+                
                 cursor.execute(sql)
                 count = cursor.fetchone()[0]
                 if count==0:
