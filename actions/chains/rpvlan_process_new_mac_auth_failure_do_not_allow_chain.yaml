@@ -1,8 +1,8 @@
 ---
   chain:
     -
-      name: "rpvlan_mac_auth_failure_do_not_allow_database"
-      ref: "campus_ztp.rpvlan_mac_auth_failure_do_not_allow_database"
+      name: "rpvlan_update_mac_auth_failure_do_not_allow_database"
+      ref: "campus_ztp.rpvlan_update_mac_auth_failure_do_not_allow_database"
       parameters:
         device: "{{device}}"
         mac: "{{mac}}"
