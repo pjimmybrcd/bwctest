@@ -5,6 +5,7 @@
 !
 authentication
 no mac-authentication enable ethernet {{port}}
+no dot1x enable ethernet {{port}}
  
 vlan {{vlan}}
   untagged ethernet {{port}}
@@ -19,6 +20,7 @@ vlan {{vlan}}
   no untagged ethernet {{port}}
 authentication
   mac-authentication enable ethernet {{port}}
+  dot1x enable ethernet {{port}}
 !
 {% endif %}
 

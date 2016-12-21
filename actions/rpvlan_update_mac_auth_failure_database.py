@@ -19,7 +19,7 @@ class RpvlanUpdateMacAuthFailureDatabaseAction(Action):
         connection = pymysql.connect(
              host="127.0.0.1", 
              user="root",      
-             passwd="password",  
+             passwd="brocade",  
              db='users')        
 
 	#Update row.

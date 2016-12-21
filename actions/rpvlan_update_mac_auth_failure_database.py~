@@ -22,7 +22,7 @@ class RpvlanUpdateMacAuthFailureDatabaseAction(Action):
              passwd="password",  
              db='users')        
 
-	#Insert new row.
+	#Update row.
 	cursor = connection.cursor()
         sql = "update authorized set device='%s', port='%s' where mac='%s'" % (device,port,mac)
         cursor.execute(sql)

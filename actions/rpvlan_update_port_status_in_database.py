@@ -20,7 +20,7 @@ class RpvlanUpdateMacAuthFailureDatabaseAction(Action):
   def process_add_port(self,device,port,vlan):
 
         connection = pymysql.connect(
-             host="127.0.0.`", 
+             host="127.0.0.1", 
              user="root",      
              passwd="brocade",  
              db='users') 
