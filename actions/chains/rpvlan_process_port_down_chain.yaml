@@ -6,7 +6,7 @@
       parameters:
         device: "{{device}}"
         template: "icx_vlan_update"
-        variables: "{\"commit\":\"false\",\"vlan\":\"223\",\"port\":\"{{port}}\"}"
+        variables: "{\"commit\":\"false\",\"vlan\":\"233\",\"port\":\"{{port}}\"}"
       on-success: "rpvlan_update_port_status_in_database"
     -
       name: "rpvlan_update_port_status_in_database"

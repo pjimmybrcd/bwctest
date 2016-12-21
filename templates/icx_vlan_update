@@ -4,11 +4,14 @@
 {% if commit=='true' %}
 !
 authentication
-no mac-authentication enable ethernet {{port}}
-no dot1x enable ethernet {{port}}
+  no dot1x enable ethernet {{port}}
+  no mac-authentication enable ethernet {{port}}
  
 vlan {{vlan}}
-  untagged ethernet {{port}}
+  tagged {{port}}
+
+{{port}}
+  dual-mode 233
 !
 {% endif %}
 {#################################################################
@@ -16,11 +19,15 @@ vlan {{vlan}}
 ##################################################################}
 {% if not commit=='true' %}
 !
-vlan {{vlan}}
-  no untagged ethernet {{port}}
 authentication
-  mac-authentication enable ethernet {{port}}
   dot1x enable ethernet {{port}}
+  mac-authentication enable ethernet {{port}}
+
+vlan {{vlan}}
+  no tagged {{port}}
+
+{{port}}
+  no dual-mode {{vlan}}
 !
 {% endif %}
 

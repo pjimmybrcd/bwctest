@@ -11,7 +11,7 @@ ztp_password: "brocade"
 tftp_server: "10.0.0.38"
 
 logging_watch_sensor:
-  logging_paths: "/var/log/switches.log"
+  logging_paths: "/var/log/syslog"
 
 # List of Boot images per vender, per device type
 boot_images:
