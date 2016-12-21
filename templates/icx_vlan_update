@@ -26,6 +26,7 @@ authentication
 interface ethernet {{port}}
   no dual-mode {{vlan}}
   no authentication auth-default-vlan 233
+  dot1x port-control auto
 
 vlan {{vlan}}
   no tagged ethernet {{port}}
