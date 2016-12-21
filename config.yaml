@@ -33,7 +33,7 @@ software_images:
 #       to campus_ztp/sensors/syslog_sensor.yaml
 #
 syslog_watch_sensor:
-  syslog_paths: "/var/log/switches.log"
+  syslog_paths: "/var/log/syslog"
   triggers:
     -
        trigger: campus_ztp.running_config_changed
