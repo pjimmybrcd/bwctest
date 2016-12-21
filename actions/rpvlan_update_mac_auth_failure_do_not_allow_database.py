@@ -19,7 +19,7 @@ class RpvlanUpdateMacAuthFailureDatabaseAction(Action):
         connection = pymysql.connect(
              host="127.0.0.1", 
              user="root",      
-             passwd="password",  
+             passwd="brocade",  
              db='users')        
 
         #Remove the mac addr tuple in table may not be in there but it's fine
