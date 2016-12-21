@@ -8,9 +8,9 @@ authentication
   no mac-authentication enable ethernet {{port}}
  
 vlan {{vlan}}
-  tagged {{port}}
+  tagged ethernet {{port}}
 
-{{port}}
+interface ethernet {{port}}
   dual-mode 233
 !
 {% endif %}
@@ -23,11 +23,11 @@ authentication
   dot1x enable ethernet {{port}}
   mac-authentication enable ethernet {{port}}
 
-vlan {{vlan}}
-  no tagged {{port}}
-
-{{port}}
+interface ethernet {{port}}
   no dual-mode {{vlan}}
+
+vlan {{vlan}}
+  no tagged ethernet {{port}}
 !
 {% endif %}
 
