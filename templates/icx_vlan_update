@@ -7,7 +7,7 @@ authentication
   no dot1x enable ethernet {{port}}
   no mac-authentication enable ethernet {{port}}
  
-vlan {{vlan}}
+vlan 233
   tagged ethernet {{port}}
 
 interface ethernet {{port}}
@@ -15,7 +15,7 @@ interface ethernet {{port}}
 !
 {% endif %}
 {#################################################################
-    This is the commands to execute to reverse the configuration
+    This are the commands to execute to reverse the configuration above
 ##################################################################}
 {% if not commit=='true' %}
 !
@@ -24,11 +24,11 @@ authentication
   mac-authentication enable ethernet {{port}}
 
 interface ethernet {{port}}
-  no dual-mode {{vlan}}
+  no dual-mode 233
   no authentication auth-default-vlan 233
   dot1x port-control auto
 
-vlan {{vlan}}
+vlan 233
   no tagged ethernet {{port}}
 !
 {% endif %}

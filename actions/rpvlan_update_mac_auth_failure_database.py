@@ -1,9 +1,9 @@
 from st2actions.runners.pythonrunner import Action
-
+from lib import actions
 import pymysql.cursors
 import json
 
-class RpvlanUpdateMacAuthFailureDatabaseAction(Action):
+class RpvlanUpdateMacAuthFailureDatabaseAction(actions.SessionAction):
   def __init__(self,config):
      super(RpvlanUpdateMacAuthFailureDatabaseAction, self).__init__(config)
 
@@ -17,10 +17,10 @@ class RpvlanUpdateMacAuthFailureDatabaseAction(Action):
   def process_mac_failure(self,device,port,mac):
 
         connection = pymysql.connect(
-             host="127.0.0.1", 
-             user="root",      
-             passwd="brocade",  
-             db='users')        
+             host=self._db_addr, 
+             user=self._db_user,      
+             passwd=self._db_pass,  
+             db=self._db_name)       
 
 	#Update row.
 	cursor = connection.cursor()

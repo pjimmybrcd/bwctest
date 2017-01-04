@@ -1,8 +1,8 @@
 from st2actions.runners.pythonrunner import Action
-
+from lib import actions
 import pymysql.cursors
 
-class RpvlanUpdateMacAuthFailureDatabaseAction(Action):
+class RpvlanUpdateMacAuthFailureDatabaseAction(actions.SessionAction):
   def __init__(self,config):
      super(RpvlanUpdateMacAuthFailureDatabaseAction, self).__init__(config)
 
@@ -20,10 +20,10 @@ class RpvlanUpdateMacAuthFailureDatabaseAction(Action):
   def process_add_port(self,device,port,vlan):
 
         connection = pymysql.connect(
-             host="127.0.0.1", 
-             user="root",      
-             passwd="brocade",  
-             db='users') 
+             host=self._db_addr, 
+             user=self._db_user,      
+             passwd=self._db_pass,  
+             db=self._db_name)
 
         cursor = connection.cursor()
 
@@ -37,10 +37,10 @@ class RpvlanUpdateMacAuthFailureDatabaseAction(Action):
 
   def process_remove_port(self,device,port):
         connection = pymysql.connect(
-             host="127.0.0.1", 
-             user="root",      
-             passwd="brocade",  
-             db='users')
+             host=self._db_addr, 
+             user=self._db_user,      
+             passwd=self._db_pass,  
+             db=self._db_name)
         
         cursor = connection.cursor()
         sql = "update authorized set device='NULL', port='NULL' where port='%s'" % (port)

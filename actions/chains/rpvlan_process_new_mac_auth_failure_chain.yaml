@@ -6,7 +6,7 @@
       parameters:
         device: "{{device}}"
         template: "icx_vlan_update"
-        variables: "{\"commit\":\"true\",\"vlan\":\"233\",\"port\":\"{{port}}\"}"
+        variables: "{\"commit\":\"true\",\"port\":\"{{port}}\"}"
       on-success: "rpvlan_update_mac_auth_failure_database"
     -
       name: "rpvlan_update_mac_auth_failure_database"

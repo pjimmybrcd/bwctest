@@ -1,7 +1,11 @@
 import os,re
 
 import pymysql
-
+from st2client.client import Client
+from st2client.models import KeyValuePair
+from oslo_config import cfg
+from keyczar.keys import AesKey
+from st2common.util.crypto import symmetric_encrypt, symmetric_decrypt
 from logshipper.tail import Tail
 
 from st2reactor.sensor.base import Sensor
@@ -16,6 +20,32 @@ class LoggingWatchSensor(Sensor):
         self._file_paths = self._config.get('logging_paths', [])
         self._trigger_ref = 'campus_ztp.logging_watch.line'
         self._tail = None
+
+        # Get Encryption Setup and Key
+        is_encryption_enabled = cfg.CONF.keyvalue.enable_encryption
+        if is_encryption_enabled:
+             crypto_key_path = cfg.CONF.keyvalue.encryption_key_path
+             with open(crypto_key_path) as key_file:
+                 crypto_key = AesKey.Read(key_file.read())
+
+        # Retrieve and decrypt values          
+        client = Client(base_url='http://localhost')
+
+        key = client.keys.get_by_name('campus_ztp.db_user')
+        if key:
+            self._db_user = symmetric_decrypt(crypto_key, key.value)
+
+        key = client.keys.get_by_name('campus_ztp.db_pass')
+        if key:
+            self._db_pass = symmetric_decrypt(crypto_key, key.value)
+
+        key = client.keys.get_by_name('campus_ztp.db_addr')
+        if key:
+            self._db_addr = symmetric_decrypt(crypto_key, key.value)
+
+        key = client.keys.get_by_name('campus_ztp.db_name')
+        if key:
+            self._db_name = symmetric_decrypt(crypto_key, key.value)
 
     def setup(self):
         if not self._file_paths:
@@ -47,7 +77,7 @@ class LoggingWatchSensor(Sensor):
         pass
 
     def _handle_line(self, file_path, line):
-        #Dec 19 17:10:17 RSOC-TEST-STACK 172.20.40.243 System: Interface ethernet 2/1/29, state down
+        #Dec 19 17:10:17 RSOC-TEST-STACK 127.0.0.1 System: Interface ethernet 2/1/29, state down
         
         regex = re.compile('(^\w+\s+\d+\s\d+:\d+:\d+ )([\w_-]+ )(\d+\.\d+\.\d+\.\d+)( System: Interface ethernet )(\d+\/\d+\/\d+)(, state down)')
         match = regex.match(line)
@@ -58,10 +88,10 @@ class LoggingWatchSensor(Sensor):
                 }
                 # check to see if this port is being used
                 connection = pymysql.connect(
-                   host="127.0.0.1",
-                   user="root",
-                   passwd="brocade",
-                   db='users')
+                   host=self._db_addr,
+                   user=self._db_user,
+                   passwd=self._db_pass,
+                   db=self._db_name)
                 cursor = connection.cursor()
 
                 # Check to make sure this port was previously authorized
@@ -78,10 +108,7 @@ class LoggingWatchSensor(Sensor):
                 return
 
 
-
-
-
-        # Jan 1 07:26:35 ZTP_Campus_ICX7750 172.20.40.243 MACAUTH: Port 1/1/48 Mac 406c.8f38.4fb7 - authentication failed since RADIUS server rejected
+        # Jan 1 07:26:35 ZTP_Campus_ICX7750 127.0.0.1 MACAUTH: Port 1/1/48 Mac 406c.8f38.4fb7 - authentication failed since RADIUS server rejected
         
         regex = re.compile('(^\w+\s+\d+\s\d+:\d+:\d+ )([\w_-]+ )(\d+\.\d+\.\d+\.\d+)( MACAUTH: Port )(\d+\/\d+\/\d+)( Mac )([0-9a-f]{4}\.[0-9a-f]{4}\.[0-9a-f]{4})( - authentication failed.*)')
         match = regex.match(line)
@@ -93,10 +120,10 @@ class LoggingWatchSensor(Sensor):
                 }
                 # check to see if this exists in DB
                 connection = pymysql.connect(
-                   host="127.0.0.1",
-                   user="root",
-                   passwd="brocade",
-                   db='users')
+                   host=self._db_addr,
+                   user=self._db_user,
+                   passwd=self._db_pass,
+                   db=self._db_name)
                 cursor = connection.cursor()
 
                 # Check to make sure this isn't already logged for tracking
