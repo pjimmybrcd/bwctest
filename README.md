@@ -133,7 +133,7 @@ The following information may be helpful to troubleshoot any issues that arise.
 
 ## Open BWC GUI
 	Open the internet browser and navigate to: http://<bwc_ip_address>
-List Sensors
+## List Sensors
 	st2 sensor list
 ## Debugging campus_ztp sensor
 sudo /opt/stackstorm/st2/bin/st2sensorcontainer --config-file=/etc/st2/st2.conf --sensor-ref=campus_ztp.LoggingWatchSensor
