@@ -48,7 +48,6 @@ class LoggingWatchSensor(Sensor):
 
     def _handle_line(self, file_path, line):
         #Dec 19 17:10:17 RSOC-TEST-STACK 172.20.40.243 System: Interface ethernet 2/1/29, state down
-        
         regex = re.compile('(^\w+\s+\d+\s\d+:\d+:\d+ )([\w_-]+ )(\d+\.\d+\.\d+\.\d+)( System: Interface ethernet )(\d+\/\d+\/\d+)(, state down)')
         match = regex.match(line)
         if match:
@@ -77,12 +76,42 @@ class LoggingWatchSensor(Sensor):
                 connection.close()
                 return
 
+        #Jan  4 14:00:49 ING-135-01 172.20.41.44 MAC Authentication failed for [f8e7.1e0f.9083 ] on port 8/1/36 (Invalid User)
+        regex = re.compile('(^\w+\s+\d+\s\d+:\d+:\d+ )([\w_-]+ )(\d+\.\d+\.\d+\.\d+)( MAC Authentication failed for \[)([0-9a-f]{4}\.[0-9a-f]{4}\.[0-9a-f]{4})( \] on port )(\d+\/\d+\/\d+)( \(Invalid User\).*)')
+        match = regex.match(line)
+        if match:
+                payload = {
+                        'device': match.group(3),
+                        'mac': match.group(5), 
+                        'port': match.group(7)
+                }
+                # check to see if this exists in DB
+                connection = pymysql.connect(
+                   host="127.0.0.1",
+                   user="root",
+                   passwd="brocade",
+                   db='users')
+                cursor = connection.cursor()
 
-
+                # Check to make sure this isn't already logged for tracking
+                sql = "select count(*) from authorized where mac='%s'" % (payload["mac"]) 
+                
+                cursor.execute(sql)
+                count = cursor.fetchone()[0]
+                if count==0:
+                    print "should not allow"
+                    trigger = 'campus_ztp.rpvlan_new_mac_auth_failure_do_not_allow'
+                    self.sensor_service.dispatch(trigger=trigger, payload=payload)
+                else:
+                    print "should allow"
+                    trigger = 'campus_ztp.rpvlan_new_mac_auth_failure'
+                    self.sensor_service.dispatch(trigger=trigger, payload=payload)
+                cursor.close()
+                connection.close()
+                return
 
 
         # Jan 1 07:26:35 ZTP_Campus_ICX7750 172.20.40.243 MACAUTH: Port 1/1/48 Mac 406c.8f38.4fb7 - authentication failed since RADIUS server rejected
-        
         regex = re.compile('(^\w+\s+\d+\s\d+:\d+:\d+ )([\w_-]+ )(\d+\.\d+\.\d+\.\d+)( MACAUTH: Port )(\d+\/\d+\/\d+)( Mac )([0-9a-f]{4}\.[0-9a-f]{4}\.[0-9a-f]{4})( - authentication failed.*)')
         match = regex.match(line)
         if match:
@@ -115,3 +144,9 @@ class LoggingWatchSensor(Sensor):
                 cursor.close()
                 connection.close()
                 return
+
+
+
+
+
+
