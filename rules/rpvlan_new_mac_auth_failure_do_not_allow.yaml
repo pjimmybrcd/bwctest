@@ -8,6 +8,7 @@ trigger:
 action:
   ref: "campus_ztp.rpvlan_process_new_mac_auth_failure_do_not_allow_chain"
   parameters:
-    device: "{{trigger.device}}"
+    ip: "{{trigger.ip}}"
+    ap_name: "{{trigger.ap_name}}"
     mac: "{{trigger.mac}}"
     port: "{{trigger.port}}"

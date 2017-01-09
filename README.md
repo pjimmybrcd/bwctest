@@ -17,14 +17,15 @@ As a Ruckus AP is plugged into a Brocade ICX, it triggers a Dot1x and MAC-AUTH s
 
 In our solution, the ICX is configured with a restricted-vlan and "auth-fail-action restricted-vlan" configured.  Devices that pass authentication are placed into the auth-default-vlan and allowed onto the corporate; however, devices that fail authentication are moved to the restricted-vlan.
 
-When the Ruckus AP is connected to the ICX switch and powers up, the ICX forwards tries to authenticate the AP's mac address with the Radius server (MAC_AUTH), where is it denied access.
+When the Ruckus AP is connected to the ICX switch and powers up, the ICX tries to authenticate the AP's mac address with the Radius server (MAC_AUTH), where is it denied access.
 
 When the ICX receives information from authorization failure message from the Radius server, it forwards the syslog message to BWC.  BWC reads the syslog message looking for these specific messages.
 
 	Example Syslog:
 		"Jan 1 07:26:35 ZTP_Campus_ICX7750 172.20.40.243 MACAUTH: Port 1/1/48 Mac 406c.8f38.4fb7 - authentication failed since RADIUS server rejected"
+		"Jan  4 14:00:49 ING-135-01 172.20.41.44 MAC Authentication failed for [EC8C.A225.B280 ] on port 1/1/36 (Invalid User)"
 
-When the syslog is matched with the format above, the MAC address from the message is compared to a list of authorized MACs stored in the database. If the MAC from the log matches a MAC address stored in the database of authorized addresses, an action chain is issued which first changes the configuration on the switch then updates the information in the database storing the location of the AP on the network. The configuration change is done by sending a template to the switch via a SSH connection.
+When the syslog is matched with the format above, the MAC address from the message is compared to a list of authorized MACs stored in the database. If the MAC from the log matches a MAC address stored in the database of authorized addresses, the device name is retrieved from the database and an action chain is issued. This action chain first changes the configuration on the switch then updates the information in the database storing the location of the AP on the network. The configuration change is done by sending a template to the switch via a SSH connection.
 
 
 If the MAC address from the syslog is not found in the database, meaning that the device is unauthorized, the information will be stored in a failures table in the database for future reference or additional actions for non-Ruckus AP devices.
@@ -63,20 +64,10 @@ Rsyslog
 1. mysql -u <username> -p
 2. CREATE database users;
 3. USE users;
-4. CREATE table failures (
-id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
-	mac varchar(20),
-	device VARCHAR(20),
-	port varchar (10)	
-	);
-5. CREATE table authorized (
-id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
-	mac varchar(20),
-	device VARCHAR(20),
-	port varchar (10)	
-	);
-6. Add your authorized macs to the authorized table. Writing a script to do this would be the most efficient way to do this. But the command below demonstrates how this can be done in MySQL:
-	INSERT INTO authorized (mac) values('0000.0000.0000');
+4. CREATE table failures (id INT NOT NULL PRIMARY KEY AUTO_INCREMENT, mac VARCHAR(20), ip VARCHAR(20), device VARCHAR(30), port VARCHAR (10));
+5. CREATE table authorized (id INT NOT NULL PRIMARY KEY AUTO_INCREMENT, mac VARCHAR(20), ip VARCHAR(20), device VARCHAR(30), port varchar (10));
+6. Add your authorized macsand device names to the authorized table. Writing a script to do this would be the most efficient way to do this. But the command below demonstrates how this can be done in MySQL:
+	INSERT INTO authorized (mac, device) values('0000.0000.0000', 'Ruckus_AP_BLD1');
 
 ### Install rsyslog
 1. sudo apt-get install rsyslog
@@ -98,27 +89,23 @@ And then add the following items (replacing it with your username and password)
 
 ## Pack Installation
 The easiest way to install the pack is by using a git link.
-1. st2 pack install https://gitlab.com/monterey/monte.git
+1. st2 pack install https://gitlab.com/brcdsolutions/sdn_ruckus_ap_onboarding.git
 2. st2ctl reload
-You can also move the entire pack to the /opt/stackstorm/pack directory then install.
+You can also move the entire pack to the /opt/stackstorm/pack directory then install by issuing the following commands.
 1. st2ctl reload
 2. st2 run packs.setup_virtualenv packs=campus_ztp
 
-To view the pack online navigate to https://gitlab.com/monterey/monte
+To view the pack online navigate to https://gitlab.com/brcdsolutions/sdn_ruckus_ap_onboarding
 
 ## Pack Removal
 To remove an installed pack from BWC do the following:
 1. st2 pack remove campus_ztp
-2. st2ctl reload
 
 ## ICX Template Configuration
-The template that is sent to the ICX will need to be updated depending on the configuration changes that are needed.
-1. Modify the template
-/opt/stacktorm.packs/campus_ztp/templates/icx_vlan_update
-2. Test the template in the terminal:
-st2 run campus_ztp.send_cli_template template='icx_vlan_update' device='<ICX_IP_Address>' variables='{"commit":"true","port":"1/1/1"}'
-3. Reload the pack
-st2ctl reload
+The template that is sent to the ICX will need to be updated depending on the configuration changes that are needed. The changes that are currently made by the template include updating the vlan, mac auth, and the port name.
+1. Modify the template: /opt/stacktorm.packs/campus_ztp/templates/icx_vlan_update
+2. Test the template in the terminal: st2 run campus_ztp.send_cli_template template='icx_vlan_update' device='<ICX_IP_Address>' variables='{"commit":"true","port":"1/1/1","ap_name":"Ruckus_AP_BLD1"}'
+3. Reload the pack: st2ctl reload
 
 # Campus ZTP
 Edit the config.yaml for your environment
@@ -137,22 +124,20 @@ The following information may be helpful to troubleshoot any issues that arise.
 	st2 sensor list
 ## Debugging campus_ztp sensor
 sudo /opt/stackstorm/st2/bin/st2sensorcontainer --config-file=/etc/st2/st2.conf --sensor-ref=campus_ztp.LoggingWatchSensor
-Tail Log
+##Tailing the Syslog messages
 	tail –f /var/log/syslog
 ## List Rows of Authorized table in Database
 1. mysql -u <username> -p
-2. CREATE database users;
-3. USE users;
-4. select * from authorized;
-5. exit;
+2. USE users;
+3. select * from authorized;
+4. exit;S
 ## List Rows of Failures table in Database
 1. mysql -u <username> -p
-2. CREATE database users;
-3. USE users;
-4. select * from failures;
-5. exit;
+2. USE users;
+3. select * from failures;
+4. exit;
 ## Test sending a Template to ICX Switch
-st2 run campus_ztp.send_cli_template template='icx_vlan_update' device='<ICX_IP_Address>' variables='{"commit":"true","port":"1/1/1"}'
+st2 run campus_ztp.send_cli_template template='icx_vlan_update' device='<ICX_IP_Address>' variables='{"commit":"true","port":"1/1/1","ap_name":"Ruckus_AP_BLD1"}'
 
 The best way to troubleshoot any issues is to first open the BWC GUI and look at the logs for any action with a red status. Is there are no actions being called, it is most likely an issue at the sensor level. Tail the log and debug the campus_ztp sensor side-by-side by running the commands above in separate terminals. The sensor should display messages stating “should not allow” or “should allow” if a syslog message is matched. If a “should not allow” message is displayed when an authorized device fails MAC Auth, then verify that the MAC is in the Authorized table. 
 

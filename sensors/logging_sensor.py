@@ -82,35 +82,40 @@ class LoggingWatchSensor(Sensor):
         match = regex.match(line)
         if match:
                 payload = {
-                        'device': match.group(3),
+                        'ip': match.group(3),
+                        'ap_name': match.group(2),
                         'port': match.group(5)
                 }
                 self.execute_port_down_trigger(payload)
                 return
 
         # Jan 1 07:26:35 ZTP_Campus_ICX7750 127.0.0.1 MACAUTH: Port 1/1/48 Mac 406c.8f38.4fb7 - authentication failed since RADIUS server rejected
-        regex = re.compile('(^\w+\s+\d+\s\d+:\d+:\d+ )([\w_-]+ )(\d+\.\d+\.\d+\.\d+)( MACAUTH: Port )(\d+\/\d+\/\d+)( Mac )([0-9a-f]{4}\.[0-9a-f]{4}\.[0-9a-f]{4})( - authentication failed.*)')
+        regex = re.compile('(^\w+\s+\d+\s\d+:\d+:\d+ )([\w_-]+ )(\d+\.\d+\.\d+\.\d+)( MACAUTH: Port )(\d+\/\d+\/\d+)( Mac )([0-9a-fA-F]{4}\.[0-9a-fA-F]{4}\.[0-9a-fA-F]{4})( - authentication failed.*)')
         match = regex.match(line)
         if match:
                 payload = {
-                        'device': match.group(3),
-                        'mac': match.group(7), 
+                        'ip': match.group(3),
+                        'ap_name': match.group(2),
+                        'mac': match.group(7),
                         'port': match.group(5)
                 }
                 self.execute_auth_failure_trigger(payload)
                 return
 
         #Jan  4 14:00:49 ING-135-01 172.20.41.44 MAC Authentication failed for [f8e7.1e0f.9083 ] on port 8/1/36 (Invalid User)
-        regex = re.compile('(^\w+\s+\d+\s\d+:\d+:\d+ )([\w_-]+ )(\d+\.\d+\.\d+\.\d+)( MAC Authentication failed for \[)([0-9a-f]{4}\.[0-9a-f]{4}\.[0-9a-f]{4})( \] on port )(\d+\/\d+\/\d+)( \(Invalid User\).*)')
+        regex = re.compile('(^\w+\s+\d+\s\d+:\d+:\d+ )([\w_-]+ )(\d+\.\d+\.\d+\.\d+)( MAC Authentication failed for \[)([0-9a-fA-F]{4}\.[0-9a-fA-F]{4}\.[0-9a-fA-F]{4})( \] on port )(\d+\/\d+\/\d+)( \(Invalid User\).*)')
         match = regex.match(line)
         if match:
                 payload = {
-                        'device': match.group(3),
+                        'ip': match.group(3),
+                        'ap_name': match.group(2),
                         'mac': match.group(5), 
                         'port': match.group(7)
                 }
                 self.execute_auth_failure_trigger(payload)
                 return
+
+
 
     def execute_auth_failure_trigger(self, payload):
         # setups a db connection
@@ -121,9 +126,8 @@ class LoggingWatchSensor(Sensor):
                 db=self._db_name)
         cursor = connection.cursor()
 
-        # Check to make sure this isn't already logged for tracking
-        sql = "select count(*) from authorized where mac='%s'" % (payload["mac"]) 
-                
+        # Check to make sure the mac exists in authorized table
+        sql = "select count(*) from authorized where mac='%s'" % (payload["mac"])
         cursor.execute(sql)
         count = cursor.fetchone()[0]
         if count==0:
@@ -132,6 +136,10 @@ class LoggingWatchSensor(Sensor):
                 self.sensor_service.dispatch(trigger=trigger, payload=payload)
         else:
                 print "should allow"
+                sql = "select device from authorized where mac='%s'" % (payload["mac"])
+                cursor.execute(sql)
+                apName = cursor.fetchone()[0]
+                payload["ap_name"] = apName
                 trigger = 'campus_ztp.rpvlan_new_mac_auth_failure'
                 self.sensor_service.dispatch(trigger=trigger, payload=payload)
         cursor.close()
@@ -149,11 +157,15 @@ class LoggingWatchSensor(Sensor):
 
         # Check if this port was previously authorized
         sql = "select count(*) from authorized where port='%s'" % (payload["port"]) 
-                
+        
         cursor.execute(sql)
         count = cursor.fetchone()[0]
         if count!=0:
                 print "port should be reverted"
+                sql = "select device from authorized where port='%s'" % (payload["port"])
+                cursor.execute(sql)
+                ap_name = cursor.fetchone()[0]
+                payload["ap_name"] = ap_name
                 trigger = 'campus_ztp.rpvlan_port_down'
                 self.sensor_service.dispatch(trigger=trigger, payload=payload)
         cursor.close()

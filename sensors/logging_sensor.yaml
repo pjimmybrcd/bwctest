@@ -9,7 +9,9 @@
       payload_schema:
         type: "object"
         properties:
-          device:
+          ip:
+            type: "string"
+          ap_name:
             type: "string"
           port:
             type: "string"
@@ -19,7 +21,9 @@
       payload_schema:
         type: "object"
         properties:
-          device:
+          ip:
+            type: "string"
+          ap_name:
             type: "string"
           mac:
             type: "string"
@@ -31,7 +35,9 @@
       payload_schema:
         type: "object"
         properties:
-          device:
+          ip:
+            type: "string"
+          ap_name:
             type: "string"
           mac:
             type: "string"

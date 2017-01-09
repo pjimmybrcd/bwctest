@@ -4,15 +4,16 @@
       name: "send_cli_template"
       ref: "campus_ztp.send_cli_template"
       parameters:
-        device: "{{device}}"
+        device: "{{ip}}"
         template: "icx_vlan_update"
-        variables: "{\"commit\":\"false\",\"port\":\"{{port}}\"}"
+        variables: "{\"commit\":\"false\",\"port\":\"{{port}}\",\"ap_name\":\"{{ap_name}}\"}"
       on-success: "rpvlan_update_port_status_in_database"
     -
       name: "rpvlan_update_port_status_in_database"
       ref: "campus_ztp.rpvlan_update_port_status_in_database"
       parameters:
-        device: "{{device}}"
+        ip: "{{ip}}"
+        ap_name: "{{ap_name}}"
         port: "{{port}}"
         action: "remove"
 

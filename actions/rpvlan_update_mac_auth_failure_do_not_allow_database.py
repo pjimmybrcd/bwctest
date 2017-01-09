@@ -7,14 +7,14 @@ class RpvlanUpdateMacAuthFailureDatabaseAction(actions.SessionAction):
   def __init__(self,config):
      super(RpvlanUpdateMacAuthFailureDatabaseAction, self).__init__(config)
 
-  def run(self,device,mac,port):
+  def run(self, ip, ap_name, mac, port):
 
-     self.process_mac_failure(device,port,mac)
+     self.process_mac_failure(ip, ap_name, port, mac)
 
      # TODO: Report errors like database failure!
      return (True)
 
-  def process_mac_failure(self,device,port,mac):
+  def process_mac_failure(self, ip, ap_name, port, mac):
 
         connection = pymysql.connect(
              host=self._db_addr, 
@@ -31,7 +31,7 @@ class RpvlanUpdateMacAuthFailureDatabaseAction(actions.SessionAction):
 
 	#Insert new row.
 	cursor = connection.cursor()
-        sql = "insert into failures (mac, device, port) values('%s','%s','%s')" % (mac,device,port)
+        sql = "insert into failures (ip, mac, device, port) values('%s','%s','%s','%s')" % (ip, mac, ap_name, port)
         cursor.execute(sql)
         connection.commit()
         cursor.close()

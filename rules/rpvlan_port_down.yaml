@@ -8,5 +8,6 @@ trigger:
 action:
   ref: "campus_ztp.rpvlan_process_port_down_chain"
   parameters:
-    device: "{{trigger.device}}"
+    ip: "{{trigger.ip}}"
+    ap_name: "{{trigger.ap_name}}"
     port: "{{trigger.port}}"
